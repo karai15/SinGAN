@@ -29,13 +29,13 @@ if __name__ == '__main__':
             pass
 
         mode = opt.mode
-        in_scale, iter_num = functions.calc_init_scale(opt)
+        in_scale, iter_num = functions.calc_init_scale(opt)  # in_scale:1階層あたりのアップ率, iter_num:繰り返し回数
         opt.scale_factor = 1 / in_scale
         opt.scale_factor_init = 1 / in_scale
         opt.mode = 'train'
         dir2trained_model = functions.generate_dir2save(opt)
         if (os.path.exists(dir2trained_model)):
-            Gs, Zs, reals, NoiseAmp = functions.load_trained_pyramid(opt)
+            Gs, Zs, reals, NoiseAmp = functions.load_trained_pyramid(opt)  # saveしているGを読み込み
             opt.mode = mode
         else:
             print('*** Train SinGAN for SR ***')
@@ -49,16 +49,16 @@ if __name__ == '__main__':
         reals_sr = []
         NoiseAmp_sr = []
         Gs_sr = []
-        real = reals[-1]  # read_image(opt)
+        real = reals[-1]  # read_image(opt)  1番解像度の高い画像(元画像度と同じ解像度)を取り出し
         real_ = real
         opt.scale_factor = 1 / in_scale
         opt.scale_factor_init = 1 / in_scale
         for j in range(1, iter_num + 1, 1):
-            real_ = imresize(real_, pow(1 / opt.scale_factor, 1), opt)
+            real_ = imresize(real_, pow(1 / opt.scale_factor, 1), opt)  # 1回目 (120, 80) -> (151, 101) (2回目以降さらに大きくなる)
             reals_sr.append(real_)
-            Gs_sr.append(Gs[-1])
+            Gs_sr.append(Gs[-1])  # 最上層のGをストック
             NoiseAmp_sr.append(NoiseAmp[-1])
-            z_opt = torch.full(real_.shape, 0, device=opt.device)
+            z_opt = torch.full(real_.shape, 0, device=opt.device)  # real_と同じサイズの0テンソル
             m = nn.ZeroPad2d(5)
             z_opt = m(z_opt)
             Zs_sr.append(z_opt)

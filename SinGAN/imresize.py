@@ -39,8 +39,8 @@ def np2torch(x,opt):
 
 def torch2uint8(x):
     x = x[0,:,:,:]
-    x = x.permute((1,2,0))
-    x = 255*denorm(x)
+    x = x.permute((1,2,0))  # 次元の入れ替え
+    x = 255*denorm(x)  # [0 255]の範囲におさめる
     x = x.cpu().numpy()
     x = x.astype(np.uint8)
     return x
@@ -48,8 +48,8 @@ def torch2uint8(x):
 
 def imresize(im,scale,opt):
     #s = im.shape
-    im = torch2uint8(im)
-    im = imresize_in(im, scale_factor=scale)
+    im = torch2uint8(im)  # [0 255]に変換
+    im = imresize_in(im, scale_factor=scale)  # upsampling
     im = np2torch(im,opt)
     #im = im[:, :, 0:int(scale * s[2]), 0:int(scale * s[3])]
     return im
@@ -66,6 +66,8 @@ def imresize_to_shape(im,output_shape,opt):
 def imresize_in(im, scale_factor=None, output_shape=None, kernel=None, antialiasing=True, kernel_shift_flag=False):
     # First standardize values and fill missing arguments (if needed) by deriving scale from output shape or vice versa
     scale_factor, output_shape = fix_scale_and_size(im.shape, output_shape, scale_factor)
+    # output_shape:アップサンプリング後のサイズを計算
+    # scale_factor: (H,W,C) 方向それぞれのスケールファクタ
 
     # For a given numeric kernel case, just do convolution and sub-sampling (downscaling only)
     if type(kernel) == np.ndarray and scale_factor[0] <= 1:

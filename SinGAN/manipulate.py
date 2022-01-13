@@ -102,21 +102,21 @@ def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,g
 
         for i in range(0,num_samples,1):
             if n == 0:
-                z_curr = functions.generate_noise([1,nzx,nzy], device=opt.device)
+                z_curr = functions.generate_noise([1,nzx,nzy], device=opt.device)  # 画像と同じサイズのノイズを作成
                 z_curr = z_curr.expand(1,3,z_curr.shape[2],z_curr.shape[3])
                 z_curr = m(z_curr)
             else:
                 z_curr = functions.generate_noise([opt.nc_z,nzx,nzy], device=opt.device)
                 z_curr = m(z_curr)
 
-            if images_prev == []:
+            if images_prev == []:  # 最下層の場合, 入力画像はin_s (元画像をrだけアップサンプリングした画像)
                 I_prev = m(in_s)
                 #I_prev = m(I_prev)
                 #I_prev = I_prev[:,:,0:z_curr.shape[2],0:z_curr.shape[3]]
                 #I_prev = functions.upsampling(I_prev,z_curr.shape[2],z_curr.shape[3])
-            else:
-                I_prev = images_prev[i]
-                I_prev = imresize(I_prev,1/opt.scale_factor, opt)
+            else:  # 2階層以上の場合, 入力画像は前の層をアップサンプリングした画像
+                I_prev = images_prev[i]  # 前の階層でのfake画像を入力画像として利用
+                I_prev = imresize(I_prev,1/opt.scale_factor, opt)  # アップサンプリング
                 if opt.mode != "SR":
                     I_prev = I_prev[:, :, 0:round(scale_v * reals[n].shape[2]), 0:round(scale_h * reals[n].shape[3])]
                     I_prev = m(I_prev)
@@ -128,8 +128,8 @@ def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,g
             if n < gen_start_scale:
                 z_curr = Z_opt
 
-            z_in = noise_amp*(z_curr)+I_prev
-            I_curr = G(z_in.detach(),I_prev)
+            z_in = noise_amp*(z_curr)+I_prev  # ノイズ+画像
+            I_curr = G(z_in.detach(),I_prev)  # Generatorが作成するfake画像
 
             if n == len(reals)-1:
                 if opt.mode == 'train':
