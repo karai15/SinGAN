@@ -34,9 +34,13 @@ if __name__ == '__main__':
         opt.scale_factor_init = 1 / in_scale
         opt.mode = 'train'
         dir2trained_model = functions.generate_dir2save(opt)
+        # dir2trained_model = ""
+
+        # 学習済みモデルが既にある場合
         if (os.path.exists(dir2trained_model)):
             Gs, Zs, reals, NoiseAmp = functions.load_trained_pyramid(opt)  # saveしているGを読み込み
             opt.mode = mode
+        # 学習済みモデルがない場合は学習する
         else:
             print('*** Train SinGAN for SR ***')
             real = functions.read_image(opt)

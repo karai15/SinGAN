@@ -13,15 +13,17 @@ def train(opt,Gs,Zs,reals,NoiseAmp):
     in_s = 0
     scale_num = 0
     real = imresize(real_,opt.scale1,opt)
-    reals = functions.creat_reals_pyramid(real,reals,opt)
+    reals = functions.creat_reals_pyramid(real,reals,opt)  # 元画像(120, 80)に対してダウンサンプリングした画像のセットを作成
     nfc_prev = 0
 
-    while scale_num<opt.stop_scale+1:
+    while scale_num<opt.stop_scale+1:  # 各階層ごとに学習開始
         opt.nfc = min(opt.nfc_init * pow(2, math.floor(scale_num / 4)), 128)
         opt.min_nfc = min(opt.min_nfc_init * pow(2, math.floor(scale_num / 4)), 128)
 
         opt.out_ = functions.generate_dir2save(opt)
         opt.outf = '%s/%d' % (opt.out_,scale_num)
+
+        # コメントアウトによって一時的にsaveをなしに設定
         try:
             os.makedirs(opt.outf)
         except OSError:
@@ -64,7 +66,7 @@ def train_single_scale(netD,netG,reals,Gs,Zs,in_s,NoiseAmp,opt,centers=None):
     real = reals[len(Gs)]
     opt.nzx = real.shape[2]#+(opt.ker_size-1)*(opt.num_layer)
     opt.nzy = real.shape[3]#+(opt.ker_size-1)*(opt.num_layer)
-    opt.receptive_field = opt.ker_size + ((opt.ker_size-1)*(opt.num_layer-1))*opt.stride
+    opt.receptive_field = opt.ker_size + ((opt.ker_size-1)*(opt.num_layer-1))*opt.stride  # パッチサイズ
     pad_noise = int(((opt.ker_size - 1) * opt.num_layer) / 2)
     pad_image = int(((opt.ker_size - 1) * opt.num_layer) / 2)
     if opt.mode == 'animation_train':
