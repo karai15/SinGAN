@@ -8,7 +8,8 @@ import SinGAN.functions as functions
 if __name__ == '__main__':
     parser = get_arguments()
     parser.add_argument('--input_dir', help='input image dir', default='Input/Images')
-    parser.add_argument('--input_name', help='training image name', default="33039_LR.png")#required=True)
+    # parser.add_argument('--input_name', help='training image name', default="33039_LR.png")#required=True)
+    parser.add_argument('--input_name', help='training image name', default="channel_obs.png")  # 無線チャネルの画像
     parser.add_argument('--sr_factor', help='super resolution factor', type=float, default=4)
     parser.add_argument('--mode', help='task to be done', default='SR')
     opt = parser.parse_args()
@@ -30,11 +31,11 @@ if __name__ == '__main__':
 
         mode = opt.mode
         in_scale, iter_num = functions.calc_init_scale(opt)  # in_scale:1階層あたりのアップ率, iter_num:繰り返し回数
-        opt.scale_factor = 1 / in_scale
-        opt.scale_factor_init = 1 / in_scale
+        opt.scale_factor = 1 / in_scale  # 1階層あたりの圧縮率
+        opt.scale_factor_init = 1 / in_scale  # 1階層あたりの圧縮率
         opt.mode = 'train'
         dir2trained_model = functions.generate_dir2save(opt)
-        # dir2trained_model = ""
+        # dir2trained_model = ""  # あえて訓練させたい場合
 
         # 学習済みモデルが既にある場合
         if (os.path.exists(dir2trained_model)):
@@ -44,7 +45,7 @@ if __name__ == '__main__':
         else:
             print('*** Train SinGAN for SR ***')
             real = functions.read_image(opt)
-            opt.min_size = 18
+            opt.min_size = 18  # 最下層の最低解像度画像の画像の幅 (もしくは高さのうち小さいほう)
             real = functions.adjust_scales2image_SR(real, opt)
             train(opt, Gs, Zs, reals, NoiseAmp)
             opt.mode = mode

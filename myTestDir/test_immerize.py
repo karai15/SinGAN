@@ -15,39 +15,12 @@ def main():
     parser = argparse.ArgumentParser()
     opt = parser.parse_args()
     opt.not_cuda = 1  # GPU利用なし
-
-    ##############################################
     # 画像情報
     opt.input_dir = "./test_image/"
     # opt.input_name = "33039_LR.png"
     opt.input_name = "channel_obs.png"
     opt.nc_im = 3  # imageのチャネル数
-
-    # 画像取得
-    image_ts = functions.read_image(opt)  # Tensor
-
-    # upsampling
-    r = 4
-    image_up_ts = imresize(image_ts, r, opt)  # 1回目 (120, 80) -> (151, 101) (2回目以降さらに大きくなる)
-
-    # npに変換
-    image_np = functions.convert_image_np(image_ts)  # numpy
-    image_up_np = functions.convert_image_np(image_up_ts)  # numpy
-
-    # true画像読み込み
-    img_true = np.array(img.imread(opt.input_dir + "channel_true.png")) # (120, 80, 3)
-    img_true = img_true[:, :, 0:3]
-
-    # plot img
-    fig, axes = plt.subplots(1, 3, tight_layout=True, squeeze=False)
-    axes[0, 0].imshow(image_np, cmap="jet")
-    axes[0, 0].set_title("origin")
-    axes[0, 1].imshow(image_up_np, cmap="jet")
-    axes[0, 1].set_title("upsampling")
-    axes[0, 2].imshow(img_true, cmap="jet")
-    axes[0, 2].set_title("true")
-    plt.suptitle("Image")
-    ##############################################
+    r = 4  # upscale
 
     ##############################################
     # データ読み込み
@@ -58,6 +31,8 @@ def main():
 
     # upsampling
     H_obs_img, min_H_obs, max_H_obs = create_save_H(H_obs)  # numpy [0 1]に正規化
+    H_img, min_H, max_H = create_save_H(H_true)  # numpy [0 1]に正規化
+
     H_obs_ts = functions.np2torch(H_obs_img * 255, opt)  # tensor  [0 255]で入力する必要
     H_obs_up_ts = imresize(H_obs_ts, r, opt)  # upsampling
     H_obs_up = functions.convert_image_np(H_obs_up_ts)  # numpy
@@ -68,12 +43,59 @@ def main():
     axes[0, 0].imshow(np.abs(H_obs), cmap="jet")
     axes[0, 0].set_title("obs")
     axes[0, 1].imshow(np.abs(H_obs_up), cmap="jet")
-    axes[0, 1].set_title("upsample")
+    axes[0, 1].set_title("upsampling")
     axes[0, 2].imshow(np.abs(H_itpl), cmap="jet")
     axes[0, 2].set_title("DFT interplation")
     axes[0, 3].imshow(np.abs(H_true), cmap="jet")
     axes[0, 3].set_title("true")
     plt.suptitle("H")
+    ##############################################
+
+
+
+    ##############################################
+    # 画像取得
+    image_ts = functions.read_image(opt)  # Tensor
+    # upsampling
+    image_up_ts = imresize(image_ts, r, opt)  # 1回目 (120, 80) -> (151, 101) (2回目以降さらに大きくなる)
+    # npに変換
+    image_np = functions.convert_image_np(image_ts)  # numpy
+    image_up_np = functions.convert_image_np(image_up_ts)  # numpy
+    # true 画像読み込み
+    img_true = np.array(img.imread(opt.input_dir + "channel_true.png")) # (120, 80, 3)
+    img_true = img_true[:, :, 0:3] / 255  # [0 1] に正規化
+    # SinGAN画像読み込み
+    img_SinGAN = np.array(img.imread(opt.input_dir + "channel_obs_HR.png"))
+    img_SinGAN = img_SinGAN[:, :, 0:3] / 255  # [0 1] に正規化
+
+    # [0 1] -> 元のスケール
+    img_complex = denormalizaton_complex(image_np, min_H_obs, max_H_obs)
+    img_up_complex = denormalizaton_complex(image_up_np, min_H_obs, max_H_obs)
+    img_true_complex = denormalizaton_complex(img_true, min_H, max_H)
+    img_SinGAN_complex = denormalizaton_complex(img_SinGAN, min_H_obs, max_H_obs)
+
+
+    ######################################
+    # test (画像化に伴う量子化誤差が大きすぎるかも)
+    e_obs = np.sum(np.abs(H_obs - img_complex)) / H_obs.size
+    e_obs_up = np.sum(np.abs(H_obs_up - img_up_complex)) / H_true.size
+    e_true = np.sum(np.abs(H_true - img_true_complex)) / H_true.size
+    e_upsample = np.sum(np.abs(H_true - img_up_complex)) / H_true.size
+    e_singan = np.sum(np.abs(H_true - img_SinGAN_complex)) / H_true.size
+    ######################################
+
+    ##############################################
+    # plot
+    fig, axes = plt.subplots(1, 4, tight_layout=True, squeeze=False)
+    axes[0, 0].imshow(np.abs(img_complex), cmap="jet")
+    axes[0, 0].set_title("obs")
+    axes[0, 1].imshow(np.abs(img_up_complex), cmap="jet")
+    axes[0, 1].set_title("upsampling")
+    axes[0, 2].imshow(np.abs(img_SinGAN_complex), cmap="jet")
+    axes[0, 2].set_title("SinGAN")
+    axes[0, 3].imshow(np.abs(img_true_complex), cmap="jet")
+    axes[0, 3].set_title("true")
+    plt.suptitle("Image")
     ##############################################
 
     plt.show()
@@ -103,34 +125,3 @@ def denormalizaton_complex(H, min_H, max_H):
 if __name__ == '__main__':
     main()
 
-
-# def plot_image(Y, N_show, title):
-#     """
-#     :param Y: (N, L, L)
-#     :param N_show:
-#     """
-#     # Observation
-#     fig, axes = plt.subplots(N_show, N_show, tight_layout=True, squeeze=False)
-#     cnt = 0
-#     for i in range(N_show):
-#         for j in range(N_show):
-#             axes[i, j].imshow(Y[cnt, :, :])
-#             cnt += 1
-#     plt.suptitle(title)
-
-
-##############################
-# def read_image(opt):
-#     x = img.imread('%s/%s' % (opt.input_dir,opt.input_name))  # (120, 80, 3)
-#     x = np2torch(x,opt)  # (1, 3, 120, 80)
-#     x = x[:,0:3,:,:]  # 3チャネルだけ抽出
-#     return x
-#
-# def imresize(im,scale,opt):
-#     #s = im.shape
-#     im = torch2uint8(im)  # [0 255]に変換
-#     im = imresize_in(im, scale_factor=scale)  # upsampling
-#     im = np2torch(im,opt)
-#     #im = im[:, :, 0:int(scale * s[2]), 0:int(scale * s[3])]
-#     return im
-##############################
