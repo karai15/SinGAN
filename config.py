@@ -5,7 +5,7 @@ def get_arguments():
     parser = argparse.ArgumentParser()
     #parser.add_argument('--mode', help='task to be done', default='train')
     #workspace:
-    parser.add_argument('--not_cuda', action='store_true', help='disables cuda', default=1)  # デフォルトでCPU利用に変更
+    parser.add_argument('--not_cuda', action='store_true', help='disables cuda', default=0)  # デフォルトでCPU利用に変更
     
     #load, input, save configurations:
     parser.add_argument('--netG', default='', help="path to netG (to continue training)")
@@ -26,8 +26,8 @@ def get_arguments():
     #pyramid parameters:
     parser.add_argument('--scale_factor',type=float,help='pyramid scale factor',default=0.75)#pow(0.5,1/6))
     parser.add_argument('--noise_amp',type=float,help='addative noise cont weight',default=0.1)
-    parser.add_argument('--min_size',type=int,help='image minimal size at the coarser scale',default=25)
-    parser.add_argument('--max_size', type=int,help='image minimal size at the coarser scale', default=250)
+    parser.add_argument('--min_size',type=int,help='image minimal size at the coarser scale',default=11)  # 25
+    parser.add_argument('--max_size', type=int,help='image minimal size at the coarser scale', default=50)  # 250
 
     #optimization hyper parameters:
     parser.add_argument('--niter', type=int, default=1, help='number of epochs to train per scale')  # 2000

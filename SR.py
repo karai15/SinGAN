@@ -45,7 +45,7 @@ if __name__ == '__main__':
         else:
             print('*** Train SinGAN for SR ***')
             real = functions.read_image(opt)
-            opt.min_size = 18  # 最下層の最低解像度画像の画像の幅 (もしくは高さのうち小さいほう)
+            opt.min_size = 11  # 最下層の最低解像度画像の画像の幅 (もしくは高さのうち小さいほう)
             real = functions.adjust_scales2image_SR(real, opt)
             train(opt, Gs, Zs, reals, NoiseAmp)
             opt.mode = mode

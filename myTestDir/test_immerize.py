@@ -66,6 +66,11 @@ def main():
     img_true = img_true[:, :, 0:3] / 255  # [0 1] に正規化
     # SinGAN画像読み込み
     img_SinGAN = np.array(img.imread(opt.input_dir + "channel_obs_HR.png"))
+    # img_SinGAN = np.array(img.imread(opt.input_dir + "channel_obs_HR_min11.png"))
+    # img_SinGAN = np.array(img.imread(opt.input_dir + "channel_obs_HR_min25.png"))
+
+
+
     img_SinGAN = img_SinGAN[:, :, 0:3] / 255  # [0 1] に正規化
 
     # [0 1] -> 元のスケール
