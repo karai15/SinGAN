@@ -206,7 +206,7 @@ def adjust_scales2image(real_,opt):
     return real
 
 def adjust_scales2image_SR(real_,opt):
-    opt.min_size = 11
+    # opt.min_size = 11
     opt.num_scales = int( ( math.log(opt.min_size / min(real_.shape[2], real_.shape[3]), opt.scale_factor_init) ) ) + 1
     scale2stop = int(math.log(min(opt.max_size , max(real_.shape[2], real_.shape[3])) / max(real_.shape[0], real_.shape[3]), opt.scale_factor_init))
     opt.stop_scale = opt.num_scales - scale2stop

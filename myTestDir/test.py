@@ -33,6 +33,11 @@ NoiseAmp: ノイズの標準偏差 (z_in = noise_amp*(z_curr)+I_prev)
 ・GoogleColabでのGPU利用
 ・（SinGANはあまり時間かけずにその他の手法に力入れたほうがいいかも）
 
+
+次回
+・calc_init_scale() iter_num=2　で学習してみる
+・線形ベイズ
+
 後でなおすところ
 ・保存済みモデルが削除されないように変更
     ・SR.py の ir2trained_model = ""

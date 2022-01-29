@@ -65,7 +65,7 @@ def main():
     img_true = np.array(img.imread(opt.input_dir + "channel_true.png")) # (120, 80, 3)
     img_true = img_true[:, :, 0:3] / 255  # [0 1] に正規化
     # SinGAN画像読み込み
-    img_SinGAN = np.array(img.imread(opt.input_dir + "channel_obs_HR.png"))
+    img_SinGAN = np.array(img.imread(opt.input_dir + "channel_obs_HR_min25_num2.png"))
     # img_SinGAN = np.array(img.imread(opt.input_dir + "channel_obs_HR_min11.png"))
     # img_SinGAN = np.array(img.imread(opt.input_dir + "channel_obs_HR_min25.png"))
 

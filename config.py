@@ -5,7 +5,7 @@ def get_arguments():
     parser = argparse.ArgumentParser()
     #parser.add_argument('--mode', help='task to be done', default='train')
     #workspace:
-    parser.add_argument('--not_cuda', action='store_true', help='disables cuda', default=0)  # デフォルトでCPU利用に変更
+    parser.add_argument('--not_cuda', action='store_true', help='disables cuda', default=1)  # デフォルトでCPU利用に変更
     
     #load, input, save configurations:
     parser.add_argument('--netG', default='', help="path to netG (to continue training)")
@@ -16,11 +16,11 @@ def get_arguments():
     parser.add_argument('--out',help='output folder',default='Output')
         
     #networks hyper parameters:
-    parser.add_argument('--nfc', type=int, default=32)
-    parser.add_argument('--min_nfc', type=int, default=32)
+    parser.add_argument('--nfc', type=int, default=8)  # 32
+    parser.add_argument('--min_nfc', type=int, default=8) # 32
     parser.add_argument('--ker_size',type=int,help='kernel size',default=3)
-    parser.add_argument('--num_layer',type=int,help='number of layers',default=5)
-    parser.add_argument('--stride',help='stride',default=1)
+    parser.add_argument('--num_layer',type=int,help='number of layers',default=5) # 5
+    parser.add_argument('--stride',help='stride',default=1)  # 1
     parser.add_argument('--padd_size',type=int,help='net pad size',default=0)#math.floor(opt.ker_size/2)
         
     #pyramid parameters:
@@ -30,7 +30,7 @@ def get_arguments():
     parser.add_argument('--max_size', type=int,help='image minimal size at the coarser scale', default=50)  # 250
 
     #optimization hyper parameters:
-    parser.add_argument('--niter', type=int, default=1, help='number of epochs to train per scale')  # 2000
+    parser.add_argument('--niter', type=int, default=2000, help='number of epochs to train per scale')  # 2000
     parser.add_argument('--gamma',type=float,help='scheduler gamma',default=0.1)
     parser.add_argument('--lr_g', type=float, default=0.0005, help='learning rate, default=0.0005')
     parser.add_argument('--lr_d', type=float, default=0.0005, help='learning rate, default=0.0005')
