@@ -5,7 +5,7 @@ def get_arguments():
     parser = argparse.ArgumentParser()
     #parser.add_argument('--mode', help='task to be done', default='train')
     #workspace:
-    parser.add_argument('--not_cuda', action='store_true', help='disables cuda', default=1)  # デフォルトでCPU利用に変更
+    parser.add_argument('--not_cuda', action='store_true', help='disables cuda', default=0)  # デフォルトでCPU利用に変更
     
     #load, input, save configurations:
     parser.add_argument('--netG', default='', help="path to netG (to continue training)")
@@ -18,15 +18,15 @@ def get_arguments():
     #networks hyper parameters:
     parser.add_argument('--nfc', type=int, default=8)  # 32
     parser.add_argument('--min_nfc', type=int, default=8) # 32
-    parser.add_argument('--ker_size',type=int,help='kernel size',default=3)
+    parser.add_argument('--ker_size',type=int,help='kernel size',default=3)  # 3
     parser.add_argument('--num_layer',type=int,help='number of layers',default=5) # 5
-    parser.add_argument('--stride',help='stride',default=1)  # 1
+    parser.add_argument('--stride',help='stride',default=3)  # 1
     parser.add_argument('--padd_size',type=int,help='net pad size',default=0)#math.floor(opt.ker_size/2)
         
     #pyramid parameters:
     parser.add_argument('--scale_factor',type=float,help='pyramid scale factor',default=0.75)#pow(0.5,1/6))
     parser.add_argument('--noise_amp',type=float,help='addative noise cont weight',default=0.1)
-    parser.add_argument('--min_size',type=int,help='image minimal size at the coarser scale',default=11)  # 25
+    parser.add_argument('--min_size',type=int,help='image minimal size at the coarser scale',default=12)  # 25
     parser.add_argument('--max_size', type=int,help='image minimal size at the coarser scale', default=50)  # 250
 
     #optimization hyper parameters:
