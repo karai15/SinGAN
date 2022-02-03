@@ -20,7 +20,7 @@ def get_arguments():
     parser.add_argument('--min_nfc', type=int, default=8) # 32
     parser.add_argument('--ker_size',type=int,help='kernel size',default=3)  # 3
     parser.add_argument('--num_layer',type=int,help='number of layers',default=5) # 5
-    parser.add_argument('--stride',help='stride',default=3)  # 1
+    parser.add_argument('--stride',help='stride',default=1)  # 1
     parser.add_argument('--padd_size',type=int,help='net pad size',default=0)#math.floor(opt.ker_size/2)
         
     #pyramid parameters:
